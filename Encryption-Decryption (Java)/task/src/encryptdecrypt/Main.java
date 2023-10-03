@@ -1,17 +1,20 @@
 package encryptdecrypt;
 
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        //Scanner scanner = new Scanner(System.in);
         String plainPad = allChars(32);
         String cryptPad;
         String outStr;
-        String eMode = scanner.nextLine();  // get encrypt or decrypt
-        String inText = scanner.nextLine();  // get text to be encrypted
-        int rotBy = scanner.nextInt();  // get rotation step value
+        //String eMode = scanner.nextLine();  // get encrypt or decrypt
+        String eMode = getArg(args, "-mode", "enc");
+        //String inText = scanner.nextLine();  // get text to be encrypted
+        String inText = getArg(args, "-data", "");
+        //int rotBy = scanner.nextInt();  // get rotation step value
+        int rotBy = Integer.parseInt(getArg(args, "-key", "0"));
         int maxRot = plainPad.length();  // fold the rotation count
         if (rotBy > maxRot || rotBy < -maxRot) {
             rotBy %= maxRot;
@@ -23,6 +26,20 @@ public class Main {
             default -> "?";
         };
         System.out.println(outStr);
+    }
+
+    public static String getArg(String[] argList, String argName, String argDefault) {
+        boolean keyword = false;
+        String argVal = new String(argDefault);
+        if (argList.length > 1) {
+            for (int i = 0; i < argList.length - 1; i++) {
+                if (argList[i].equals(argName)) {
+                    argVal = argList[i+1];
+                    break;
+                }
+            }
+        }
+        return argVal;
     }
 
     public static String allChars(int firstCode) {
