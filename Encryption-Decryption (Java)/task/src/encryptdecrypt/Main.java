@@ -6,24 +6,32 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String plainPad = "abcdefghijklmnopqrstuvwxyz";
+        String plainPad = allChars(32);
         String cryptPad;
+        String outStr;
+        String eMode = scanner.nextLine();  // get encrypt or decrypt
         String inText = scanner.nextLine();  // get text to be encrypted
-        //String inText = "we found a treasure!";
         int rotBy = scanner.nextInt();  // get rotation step value
-        int maxRot = plainPad.length();
-        if (rotBy > maxRot || rotBy < -maxRot) { rotBy %= maxRot; }
-        cryptPad = rotateString(plainPad, rotBy);
-        char[] outText = inText.toCharArray();
-
-        int index;
-        for (int i = 0; i < inText.length(); i++) {
-            index = plainPad.indexOf(inText.charAt(i));
-            if (index != -1) {
-                outText[i] = cryptPad.charAt(index);
-            }
+        int maxRot = plainPad.length();  // fold the rotation count
+        if (rotBy > maxRot || rotBy < -maxRot) {
+            rotBy %= maxRot;
         }
-        System.out.println(outText);
+        cryptPad = rotateString(plainPad, rotBy);  //form encrypt and decrypt pads
+        outStr = switch (eMode) {
+            case "enc" -> encStr(inText, plainPad, cryptPad);
+            case "dec" -> decStr(inText, plainPad, cryptPad);
+            default -> "?";
+        };
+        System.out.println(outStr);
+    }
+
+    public static String allChars(int firstCode) {
+        int cLen = 256 - firstCode;
+        char[] c = new char[cLen];
+        for (int i = firstCode; i < cLen; i++) {
+            c[i] = (char)i;
+        }
+        return new String(c);
     }
 
     public static String rotateString(String inStr, int r) {
@@ -34,7 +42,32 @@ public class Main {
         for (int i = 0; i < strLen; i++) {
             outChar[i] = inStr.charAt((i+r)%strLen);
         }
-        String dummy = "";
-        return dummy.copyValueOf(outChar, 0, strLen);
+        return new String(outChar);
+    }
+
+    // encrypt a plaintext string
+    public static String encStr(String pStr, String pPad, String ePad) {
+        char[] outChar = pStr.toCharArray();
+        int index;
+        for (int i = 0; i < pStr.length(); i++) {
+            index = pPad.indexOf(pStr.charAt(i));
+            if (index != -1) {
+                outChar[i] = ePad.charAt(index);
+            }
+        }
+        return new String(outChar);
+    }
+
+    // decrypt a cyphertext string returning plaintext
+    public static String decStr(String cStr, String pPad, String ePad) {
+        char[] outChar = cStr.toCharArray();
+        int index;
+        for (int i = 0; i < cStr.length(); i++) {
+            index = ePad.indexOf(cStr.charAt(i));
+            if (index != -1) {
+                outChar[i] = pPad.charAt(index);
+            }
+        }
+        return new String(outChar);
     }
 }
